@@ -1,0 +1,77 @@
+@use "../../styles/variables" as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $header-height;
+  padding: 0 20px;
+  background: $color-surface;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: $color-accent;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.buttonArea {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.primary {
+  background: $color-accent;
+  color: #fff;
+}
+
+.secondary {
+  background: $color-surface;
+  color: $color-text-primary;
+  border: 1px solid $color-border;
+
+  &:hover {
+    background: #f9fafb;
+    opacity: 1;
+  }
+}
