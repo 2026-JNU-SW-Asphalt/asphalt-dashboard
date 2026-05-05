@@ -1,0 +1,17 @@
+@use "../../styles/variables" as *;
+
+.statsBar {
+  display: flex;
+  flex-direction: row;
+  gap: $content-gap;
+  width: 100%;
+}
+
+.errorMessage {
+  flex: 1;
+  padding: 24px;
+  text-align: center;
+  color: $color-risk-urgent;
+  background: $color-surface;
+  border-radius: $radius-md;
+}
