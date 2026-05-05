@@ -1,0 +1,20 @@
+@use "../../styles/variables" as *;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: $filter-panel-width;
+  flex-shrink: 0;
+  padding: 20px;
+  background: $color-surface;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
