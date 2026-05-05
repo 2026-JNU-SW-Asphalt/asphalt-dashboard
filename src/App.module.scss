@@ -1,0 +1,17 @@
+@use "./styles/variables" as *;
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: $page-padding;
+  gap: $content-gap;
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  gap: $content-gap;
+  flex: 1;
+  min-height: $map-min-height;
+}
