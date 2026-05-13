@@ -61,6 +61,22 @@ export interface DashboardResponse {
   };
 }
 
+/** POST /api/admin/verify-key 성공 응답 */
+export interface AdminVerifyResponse {
+  status: string;
+  message: string;
+  admin_token: string;
+  expires_at: string;
+}
+
+/** PATCH /api/incidents/{id}/status 성공 응답 */
+export interface StatusChangeResponse {
+  status: string;
+  incident_id: string;
+  requested_status: RepairStatus;
+  updated_status: RepairStatus;
+}
+
 /** FilterContext에서 관리하는 필터 상태 */
 export interface FilterState {
   gu: string; // '전체' or District

@@ -1,6 +1,15 @@
-import type { IncidentListResponse, IncidentDetail, DashboardResponse, FilterState } from '../types/incident';
+import type {
+  IncidentListResponse,
+  IncidentDetail,
+  DashboardResponse,
+  FilterState,
+  AdminVerifyResponse,
+  StatusChangeResponse,
+} from '../types/incident';
 
 const BASE_URL = '/api';
+
+// ─── 필터 파라미터 빌드 ───
 
 function buildIncidentParams(filters: FilterState): URLSearchParams {
   const params = new URLSearchParams();
@@ -13,6 +22,8 @@ function buildIncidentParams(filters: FilterState): URLSearchParams {
   params.set('order', filters.order);
   return params;
 }
+
+// ─── Incident 조회 ───
 
 export async function fetchIncidents(filters: FilterState): Promise<IncidentListResponse> {
   const params = buildIncidentParams(filters);
@@ -31,5 +42,47 @@ export async function fetchIncidentDetail(id: string): Promise<IncidentDetail> {
 export async function fetchDashboard(): Promise<DashboardResponse> {
   const res = await fetch(`${BASE_URL}/incidents/dashboard`);
   if (!res.ok) throw new Error('dashboard 조회 실패');
+  return res.json();
+}
+
+// ─── 관리자 인증 ───
+
+export async function verifyAdminKey(adminKey: string): Promise<AdminVerifyResponse> {
+  const res = await fetch(`${BASE_URL}/admin/verify-key`, {
+    method: 'POST',
+    headers: {
+      'X-Admin-Key': adminKey,
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail ?? '관리자 키 인증 실패');
+  }
+
+  return res.json();
+}
+
+// ─── 상태 변경 ───
+
+export async function patchIncidentStatus(
+  incidentId: string,
+  newStatus: string,
+  adminToken: string,
+): Promise<StatusChangeResponse> {
+  const res = await fetch(`${BASE_URL}/incidents/${incidentId}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Token': adminToken,
+    },
+    body: JSON.stringify({ status: newStatus }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail ?? '상태 변경 실패');
+  }
+
   return res.json();
 }

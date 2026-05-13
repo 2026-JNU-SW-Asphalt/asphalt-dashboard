@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:mock": "cross-env VITE_USE_MOCK=true vite",
+    "dev:real": "cross-env VITE_USE_MOCK=false vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -22,6 +24,7 @@
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
     "@vitejs/plugin-react": "^6.0.1",
+    "cross-env": "^10.1.0",
     "eslint": "^9.7.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
