@@ -1,4 +1,5 @@
 import { FilterProvider } from './contexts/FilterContext';
+import { IncidentsProvider } from './contexts/IncidentsContext';
 import Header from './components/Header/Header';
 import StatsBar from './components/StatsBar/StatsBar';
 import MapView from './components/MapView/MapView';
@@ -8,14 +9,16 @@ import styles from './App.module.scss';
 function App() {
   return (
     <FilterProvider>
-      <div className={styles.app}>
-        <Header />
-        <StatsBar />
-        <main className={styles.main}>
-          <MapView />
-          <FilterPanel />
-        </main>
-      </div>
+      <IncidentsProvider>
+        <div className={styles.app}>
+          <Header />
+          <StatsBar />
+          <main className={styles.main}>
+            <MapView />
+            <FilterPanel />
+          </main>
+        </div>
+      </IncidentsProvider>
     </FilterProvider>
   );
 }

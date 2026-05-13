@@ -1,4 +1,4 @@
-import { useIncidents } from '../../../hooks/useIncidents';
+import { useIncidentsContext } from '../../../contexts/IncidentsContext';
 import styles from './IncidentList.module.scss';
 
 import type { RiskLevel, RepairStatus } from '../../../types/incident';
@@ -27,7 +27,7 @@ function statusBadgeClass(status: RepairStatus): string {
   }
 }
 
-/** ISO 8601 → 'YYYY-MM-DD' 날짜만 표시 */
+/** ISO 8601 → 'YYYY-MM-DD' */
 function formatDate(iso: string): string {
   return iso.slice(0, 10);
 }
@@ -39,9 +39,8 @@ function shortId(incidentId: string): string {
 }
 
 export default function IncidentList() {
-  const { data, loading, error } = useIncidents();
+  const { data, loading, error } = useIncidentsContext();
 
-  // 로딩
   if (loading) {
     return (
       <div className={styles.wrapper}>
@@ -50,7 +49,6 @@ export default function IncidentList() {
     );
   }
 
-  // 에러
   if (error || !data) {
     return (
       <div className={styles.wrapper}>
@@ -63,13 +61,11 @@ export default function IncidentList() {
 
   return (
     <div className={styles.wrapper}>
-      {/* 헤더: 건수 표시 */}
       <div className={styles.header}>
         <span className={styles.listTitle}>포트홀 목록</span>
         <span className={styles.count}>{count}건</span>
       </div>
 
-      {/* 테이블 */}
       <div className={styles.tableWrap}>
         {items.length === 0 ? (
           <div className={styles.emptyState}>조건에 맞는 포트홀이 없습니다.</div>
@@ -91,9 +87,7 @@ export default function IncidentList() {
                     <span className={`${styles.riskBadge} ${riskBadgeClass(item.risk_level)}`}>{item.risk_level}</span>
                   </td>
                   <td className={styles.incidentId}>{shortId(item.incident_id)}</td>
-                  <td className={styles.address} title={item.address}>
-                    {item.address}
-                  </td>
+                  <td className={styles.address}>{item.address}</td>
                   <td className={styles.date}>{formatDate(item.occurred_at)}</td>
                   <td>
                     <span className={`${styles.statusBadge} ${statusBadgeClass(item.status)}`}>{item.status}</span>

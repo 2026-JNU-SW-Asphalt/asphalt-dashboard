@@ -7,7 +7,11 @@ import type {
   StatusChangeResponse,
 } from '../types/incident';
 
-const BASE_URL = '/api';
+const isMock = import.meta.env.VITE_USE_MOCK === 'true';
+const BASE_URL = isMock ? '/api' : import.meta.env.VITE_API_BASE_URL || '/api';
+const defaultHeaders = {
+  'ngrok-skip-browser-warning': '69420',
+};
 
 // ─── 필터 파라미터 빌드 ───
 
@@ -27,7 +31,10 @@ function buildIncidentParams(filters: FilterState): URLSearchParams {
 
 export async function fetchIncidents(filters: FilterState): Promise<IncidentListResponse> {
   const params = buildIncidentParams(filters);
-  const res = await fetch(`${BASE_URL}/incidents?${params.toString()}`);
+  // ⭐ 추가된 부분: 두 번째 인자로 headers 전달
+  const res = await fetch(`${BASE_URL}/incidents?${params.toString()}`, {
+    headers: defaultHeaders,
+  });
   if (!res.ok) throw new Error('incidents 조회 실패');
   return res.json();
 }
@@ -40,7 +47,9 @@ export async function fetchIncidentDetail(id: string): Promise<IncidentDetail> {
 }
 
 export async function fetchDashboard(): Promise<DashboardResponse> {
-  const res = await fetch(`${BASE_URL}/incidents/dashboard`);
+  const res = await fetch(`${BASE_URL}/incidents/dashboard`, {
+    headers: defaultHeaders,
+  });
   if (!res.ok) throw new Error('dashboard 조회 실패');
   return res.json();
 }
@@ -51,6 +60,7 @@ export async function verifyAdminKey(adminKey: string): Promise<AdminVerifyRespo
   const res = await fetch(`${BASE_URL}/admin/verify-key`, {
     method: 'POST',
     headers: {
+      ...defaultHeaders, // ⭐ 추가된 부분: 기존 헤더에 공통 헤더 병합
       'X-Admin-Key': adminKey,
     },
   });
@@ -73,6 +83,7 @@ export async function patchIncidentStatus(
   const res = await fetch(`${BASE_URL}/incidents/${incidentId}/status`, {
     method: 'PATCH',
     headers: {
+      ...defaultHeaders, // ⭐ 추가된 부분: 기존 헤더에 공통 헤더 병합
       'Content-Type': 'application/json',
       'X-Admin-Token': adminToken,
     },
