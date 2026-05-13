@@ -1,0 +1,177 @@
+@use "../../styles/variables" as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal {
+  width: 380px;
+  max-width: 90vw;
+  background: $color-surface;
+  border-radius: $radius-lg;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid $color-border;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  font-size: 16px;
+  color: $color-text-secondary;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.12s;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+.body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: $color-text-secondary;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: $color-accent;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+/* ── 에러 메시지 영역: 높이 고정으로 UI 점프 방지 ── */
+.errorSlot {
+  min-height: 20px; /* 에러 텍스트 1줄 높이 확보 */
+  display: flex;
+  align-items: center;
+}
+
+.error {
+  font-size: 13px;
+  color: $color-risk-urgent;
+  margin: 0;
+  line-height: 20px;
+}
+
+.notice {
+  font-size: 14px;
+  color: $color-text-secondary;
+  text-align: center;
+  padding: 12px 0;
+  margin: 0;
+}
+
+.primaryBtn {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: $color-accent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* ── 상태 선택 버튼 그룹 ── */
+.statusGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.statusOption {
+  flex: 1;
+  padding: 10px 6px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1.5px solid $color-border;
+  border-radius: 8px;
+  background: $color-surface;
+  color: $color-text-primary;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+  text-align: center;
+  position: relative;
+
+  &:hover:not(:disabled) {
+    border-color: $color-accent;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.statusSelected {
+  border-color: $color-accent;
+  background: #eff6ff;
+  color: $color-accent;
+}
+
+.statusCurrent {
+  /* 현재 상태 시각적 표시 */
+}
+
+.currentTag {
+  display: block;
+  font-size: 10px;
+  color: $color-text-secondary;
+  margin-top: 2px;
+}

@@ -1,0 +1,255 @@
+@use "../../styles/variables" as *;
+
+$modal-width: 440px;
+$modal-height: 884px;
+$header-h: 88px;
+$photo-h: 440px;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  width: $modal-width;
+  height: $modal-height;
+  background: $color-surface;
+  border-radius: $radius-lg;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden; /* 스크롤바 숨김 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 파란 헤더 (88px 고정) ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $header-h;
+  padding: 0 24px;
+  background: $color-accent;
+  color: #fff;
+  border-radius: $radius-lg $radius-lg 0 0;
+  flex-shrink: 0;
+}
+
+.headerLabel {
+  font-size: 12px;
+  opacity: 0.8;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.headerId {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.headerClose {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.12s;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.35);
+  }
+}
+
+/* ── 사진 영역 (440×440, 흰색 배경) ── */
+.photoWrap {
+  position: relative;
+  width: $modal-width;
+  height: $photo-h;
+  flex-shrink: 0;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #ffffff; /* 로드 전 흰색 */
+}
+
+.statusBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid;
+}
+
+/* ── 정보 필드 ── */
+.info {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.infoRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.infoLabel {
+  font-size: 12px;
+  color: $color-text-secondary;
+  line-height: 17px; /* 12px * 1.4 ≈ 17px, px 고정 */
+}
+
+.infoValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-text-primary;
+  word-break: keep-all;
+  line-height: 22px; /* 정확한 px 단위로 shimmerLine과 일치 */
+  min-height: 22px;
+}
+
+/* ── 하단 버튼 ── */
+.footer {
+  padding: 0 24px 20px;
+  flex-shrink: 0;
+}
+
+.manageBtn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: $color-accent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/* ══════════════════════════════════════
+   스켈레톤
+   ══════════════════════════════════════ */
+
+/* 헤더 내 ID shimmer (스켈레톤용) */
+.skeletonIdLine {
+  height: 34px; /* .headerId font-size 28px + line-height */
+  width: 140px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+/* 사진 스켈레톤 (440×440, 흰색) */
+.skeletonPhoto {
+  width: $modal-width;
+  height: $photo-h;
+  background: #ffffff;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.03) 50%, transparent 100%);
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+/* 데이터 shimmer 라인 (라벨 옆 값 자리) */
+.shimmerLine {
+  display: block;
+  height: 22px; /* .infoValue line-height와 정확히 일치 */
+  line-height: 22px;
+  width: 60%;
+  border-radius: 4px;
+  background: #e5e7eb;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ── 에러 오버레이 ── */
+.errorOverlay {
+  width: $modal-width;
+  height: $modal-height;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: $color-risk-urgent;
+  font-size: 14px;
+
+  button {
+    padding: 8px 20px;
+    font-size: 13px;
+    border: 1px solid $color-border;
+    border-radius: 6px;
+    background: $color-surface;
+    color: $color-text-primary;
+    cursor: pointer;
+  }
+}

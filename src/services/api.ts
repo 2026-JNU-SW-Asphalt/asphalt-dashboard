@@ -31,7 +31,6 @@ function buildIncidentParams(filters: FilterState): URLSearchParams {
 
 export async function fetchIncidents(filters: FilterState): Promise<IncidentListResponse> {
   const params = buildIncidentParams(filters);
-  // ⭐ 추가된 부분: 두 번째 인자로 headers 전달
   const res = await fetch(`${BASE_URL}/incidents?${params.toString()}`, {
     headers: defaultHeaders,
   });
@@ -40,7 +39,9 @@ export async function fetchIncidents(filters: FilterState): Promise<IncidentList
 }
 
 export async function fetchIncidentDetail(id: string): Promise<IncidentDetail> {
-  const res = await fetch(`${BASE_URL}/incidents/${id}`);
+  const res = await fetch(`${BASE_URL}/incidents/${id}`, {
+    headers: defaultHeaders,
+  });
   if (!res.ok) throw new Error('incident 상세 조회 실패');
   const data = await res.json();
   return data.item;
@@ -60,7 +61,7 @@ export async function verifyAdminKey(adminKey: string): Promise<AdminVerifyRespo
   const res = await fetch(`${BASE_URL}/admin/verify-key`, {
     method: 'POST',
     headers: {
-      ...defaultHeaders, // ⭐ 추가된 부분: 기존 헤더에 공통 헤더 병합
+      ...defaultHeaders,
       'X-Admin-Key': adminKey,
     },
   });
@@ -83,7 +84,7 @@ export async function patchIncidentStatus(
   const res = await fetch(`${BASE_URL}/incidents/${incidentId}/status`, {
     method: 'PATCH',
     headers: {
-      ...defaultHeaders, // ⭐ 추가된 부분: 기존 헤더에 공통 헤더 병합
+      ...defaultHeaders,
       'Content-Type': 'application/json',
       'X-Admin-Token': adminToken,
     },

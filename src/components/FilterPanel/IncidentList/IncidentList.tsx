@@ -1,9 +1,9 @@
 import { useIncidentsContext } from '../../../contexts/IncidentsContext';
+import { useSelectedIncident } from '../../../contexts/SelectedIncidentContext';
 import styles from './IncidentList.module.scss';
 
 import type { RiskLevel, RepairStatus } from '../../../types/incident';
 
-/** 위험도 배지 스타일 매핑 */
 function riskBadgeClass(level: RiskLevel): string {
   switch (level) {
     case '긴급':
@@ -15,7 +15,6 @@ function riskBadgeClass(level: RiskLevel): string {
   }
 }
 
-/** 상태 배지 스타일 매핑 */
 function statusBadgeClass(status: RepairStatus): string {
   switch (status) {
     case '보수전':
@@ -27,12 +26,10 @@ function statusBadgeClass(status: RepairStatus): string {
   }
 }
 
-/** ISO 8601 → 'YYYY-MM-DD' */
 function formatDate(iso: string): string {
   return iso.slice(0, 10);
 }
 
-/** incident_id에서 짧은 번호 추출 (INC-00000001 → 001) */
 function shortId(incidentId: string): string {
   const num = incidentId.replace(/^INC-0*/, '');
   return num.padStart(3, '0');
@@ -40,6 +37,7 @@ function shortId(incidentId: string): string {
 
 export default function IncidentList() {
   const { data, loading, error } = useIncidentsContext();
+  const { setSelectedId } = useSelectedIncident();
 
   if (loading) {
     return (
@@ -82,7 +80,7 @@ export default function IncidentList() {
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={item.incident_id}>
+                <tr key={item.incident_id} onClick={() => setSelectedId(item.incident_id)}>
                   <td>
                     <span className={`${styles.riskBadge} ${riskBadgeClass(item.risk_level)}`}>{item.risk_level}</span>
                   </td>
