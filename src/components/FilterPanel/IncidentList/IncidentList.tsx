@@ -1,5 +1,6 @@
 import { useIncidentsContext } from '../../../contexts/IncidentsContext';
 import { useSelectedIncident } from '../../../contexts/SelectedIncidentContext';
+import { useHoveredIncident } from '../../../contexts/HoveredIncidentContext';
 import styles from './IncidentList.module.scss';
 
 import type { RiskLevel, RepairStatus } from '../../../types/incident';
@@ -38,6 +39,7 @@ function shortId(incidentId: string): string {
 export default function IncidentList() {
   const { data, loading, error } = useIncidentsContext();
   const { setSelectedId } = useSelectedIncident();
+  const { setHoveredId } = useHoveredIncident();
 
   if (loading) {
     return (
@@ -80,7 +82,12 @@ export default function IncidentList() {
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={item.incident_id} onClick={() => setSelectedId(item.incident_id)}>
+                <tr
+                  key={item.incident_id}
+                  onClick={() => setSelectedId(item.incident_id)}
+                  onMouseEnter={() => setHoveredId(item.incident_id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                >
                   <td>
                     <span className={`${styles.riskBadge} ${riskBadgeClass(item.risk_level)}`}>{item.risk_level}</span>
                   </td>

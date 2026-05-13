@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useIncidentsContext } from '../../contexts/IncidentsContext';
 import { useSelectedIncident } from '../../contexts/SelectedIncidentContext';
+import { useHoveredIncident } from '../../contexts/HoveredIncidentContext';
 import styles from './MapView.module.scss';
 
 import type { RiskLevel, RepairStatus, IncidentSummary } from '../../types/incident';
@@ -26,21 +27,38 @@ function getPinColor(item: IncidentSummary, mode: ColorMode): string {
   return mode === 'risk_level' ? RISK_COLORS[item.risk_level] : STATUS_COLORS[item.status];
 }
 
-function createPinDataUri(fillColor: string): string {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.3 21.7 0 14 0z" fill="${fillColor}" stroke="#fff" stroke-width="1.5"/><circle cx="14" cy="14" r="5.5" fill="#fff"/></svg>`;
+// ─── 핀 SVG (일반 / 강조) ───
+const PIN_NORMAL = { w: 28, h: 40 };
+const PIN_HIGHLIGHT = { w: 33, h: 47 };
+
+function createPinSvg(fillColor: string, w: number, h: number, strokeW = 1.5, strokeColor = '#fff'): string {
+  // viewBox에 stroke 두께만큼 padding을 줘서 테두리 잘림 방지
+  const pad = strokeW;
+  const vbX = -pad;
+  const vbY = -pad;
+  const vbW = 28 + pad * 2;
+  const vbH = 40 + pad * 2;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vbX} ${vbY} ${vbW} ${vbH}"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.3 21.7 0 14 0z" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeW}"/><circle cx="14" cy="14" r="5.5" fill="#fff"/></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
+// 캐시: "color|size|strokeColor" → MarkerImage
 const imageCache = new Map<string, kakao.maps.MarkerImage>();
-function getMarkerImage(color: string): kakao.maps.MarkerImage {
-  if (imageCache.has(color)) return imageCache.get(color)!;
-  const img = new kakao.maps.MarkerImage(createPinDataUri(color), new kakao.maps.Size(28, 40), {
-    offset: new kakao.maps.Point(14, 40),
+
+function getMarkerImage(color: string, highlight = false): kakao.maps.MarkerImage {
+  const { w, h } = highlight ? PIN_HIGHLIGHT : PIN_NORMAL;
+  const strokeColor = highlight ? '#000' : '#fff';
+  const strokeW = 1.5;
+  const key = `${color}|${w}|${strokeColor}`;
+  if (imageCache.has(key)) return imageCache.get(key)!;
+  const img = new kakao.maps.MarkerImage(createPinSvg(color, w, h, strokeW, strokeColor), new kakao.maps.Size(w, h), {
+    offset: new kakao.maps.Point(w / 2, h),
   });
-  imageCache.set(color, img);
+  imageCache.set(key, img);
   return img;
 }
 
+// ─── SDK 로드 ───
 let sdkPromise: Promise<void> | null = null;
 function loadKakaoMapSDK(): Promise<void> {
   if (sdkPromise) return sdkPromise;
@@ -60,6 +78,7 @@ function loadKakaoMapSDK(): Promise<void> {
   return sdkPromise;
 }
 
+// ─── 범례 ───
 const RISK_LEGEND: { label: RiskLevel; color: string }[] = [
   { label: '긴급', color: RISK_COLORS['긴급'] },
   { label: '주의', color: RISK_COLORS['주의'] },
@@ -71,10 +90,13 @@ const STATUS_LEGEND: { label: RepairStatus; color: string }[] = [
   { label: '보수완료', color: STATUS_COLORS['보수완료'] },
 ];
 
+// ─── 컴포넌트 ───
 export default function MapView() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<kakao.maps.Map | null>(null);
-  const markersRef = useRef<kakao.maps.Marker[]>([]);
+
+  // incidentId → { marker, color } 매핑 (hover 시 빠른 조회용)
+  const markerMapRef = useRef<Map<string, { marker: kakao.maps.Marker; color: string }>>(new Map());
 
   const [sdkReady, setSdkReady] = useState(false);
   const [sdkError, setSdkError] = useState<string | null>(null);
@@ -82,6 +104,10 @@ export default function MapView() {
 
   const { data } = useIncidentsContext();
   const { setSelectedId } = useSelectedIncident();
+  const { hoveredId } = useHoveredIncident();
+
+  // 이전 hover 대상 복원용
+  const prevHoveredRef = useRef<string | null>(null);
 
   useEffect(() => {
     loadKakaoMapSDK()
@@ -97,32 +123,58 @@ export default function MapView() {
     });
   }, [sdkReady]);
 
-  const handleMarkerClick = useCallback(
-    (item: IncidentSummary) => {
-      setSelectedId(item.incident_id);
-    },
-    [setSelectedId],
-  );
+  const handleMarkerClick = useCallback((item: IncidentSummary) => setSelectedId(item.incident_id), [setSelectedId]);
 
+  // 마커 생성/갱신
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !sdkReady || !data) return;
 
-    markersRef.current.forEach((m) => m.setMap(null));
-    markersRef.current = [];
+    // 기존 마커 제거
+    markerMapRef.current.forEach(({ marker }) => marker.setMap(null));
+    markerMapRef.current.clear();
 
-    markersRef.current = data.items.map((item) => {
+    data.items.forEach((item) => {
       const color = getPinColor(item, colorMode);
       const marker = new kakao.maps.Marker({
         position: new kakao.maps.LatLng(item.lat, item.lng),
         map,
-        image: getMarkerImage(color),
+        image: getMarkerImage(color, false),
         title: item.address,
+        zIndex: 0,
       });
       kakao.maps.event.addListener(marker, 'click', () => handleMarkerClick(item));
-      return marker;
+      markerMapRef.current.set(item.incident_id, { marker, color });
     });
+
+    prevHoveredRef.current = null;
   }, [data, sdkReady, colorMode, handleMarkerClick]);
+
+  // ─── hover 강조 / 해제 ───
+  useEffect(() => {
+    const mMap = markerMapRef.current;
+
+    // 이전 hover 해제
+    const prevId = prevHoveredRef.current;
+    if (prevId && prevId !== hoveredId) {
+      const entry = mMap.get(prevId);
+      if (entry) {
+        entry.marker.setImage(getMarkerImage(entry.color, false));
+        entry.marker.setZIndex(0);
+      }
+    }
+
+    // 새 hover 강조
+    if (hoveredId) {
+      const entry = mMap.get(hoveredId);
+      if (entry) {
+        entry.marker.setImage(getMarkerImage(entry.color, true));
+        entry.marker.setZIndex(999);
+      }
+    }
+
+    prevHoveredRef.current = hoveredId;
+  }, [hoveredId]);
 
   const legend = colorMode === 'risk_level' ? RISK_LEGEND : STATUS_LEGEND;
 

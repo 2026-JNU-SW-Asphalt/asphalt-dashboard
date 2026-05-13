@@ -29,11 +29,13 @@ declare namespace kakao.maps {
   }
 
   class Marker {
-    constructor(options: { position: LatLng; map?: Map; image?: MarkerImage; title?: string });
+    constructor(options: { position: LatLng; map?: Map; image?: MarkerImage; title?: string; zIndex?: number });
     setMap(map: Map | null): void;
     getPosition(): LatLng;
     setPosition(position: LatLng): void;
     setImage(image: MarkerImage): void;
+    setZIndex(zIndex: number): void;
+    getZIndex(): number;
   }
 
   class MarkerImage {

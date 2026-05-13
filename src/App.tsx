@@ -1,6 +1,7 @@
 import { FilterProvider } from './contexts/FilterContext';
 import { IncidentsProvider } from './contexts/IncidentsContext';
 import { SelectedIncidentProvider } from './contexts/SelectedIncidentContext';
+import { HoveredIncidentProvider } from './contexts/HoveredIncidentContext';
 import Header from './components/Header/Header';
 import StatsBar from './components/StatsBar/StatsBar';
 import MapView from './components/MapView/MapView';
@@ -13,16 +14,17 @@ function App() {
     <FilterProvider>
       <IncidentsProvider>
         <SelectedIncidentProvider>
-          <div className={styles.app}>
-            <Header />
-            <StatsBar />
-            <main className={styles.main}>
-              <MapView />
-              <FilterPanel />
-            </main>
-          </div>
-          {/* 포트홀 상세 팝업 (전역 — selectedId가 있을 때만 렌더) */}
-          <IncidentDetailModal />
+          <HoveredIncidentProvider>
+            <div className={styles.app}>
+              <Header />
+              <StatsBar />
+              <main className={styles.main}>
+                <MapView />
+                <FilterPanel />
+              </main>
+            </div>
+            <IncidentDetailModal />
+          </HoveredIncidentProvider>
         </SelectedIncidentProvider>
       </IncidentsProvider>
     </FilterProvider>
