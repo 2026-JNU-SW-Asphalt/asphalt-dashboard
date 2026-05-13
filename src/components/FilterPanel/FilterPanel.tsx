@@ -1,4 +1,5 @@
 import FilterBox from './FilterBox/FilterBox';
+import IncidentList from './IncidentList/IncidentList';
 import styles from './FilterPanel.module.scss';
 
 export default function FilterPanel() {
@@ -6,7 +7,7 @@ export default function FilterPanel() {
     <aside className={styles.panel}>
       <h2 className={styles.title}>상세 목록 및 필터</h2>
       <FilterBox />
-      {/* PotholeList는 8단계에서 추가 */}
+      <IncidentList />
     </aside>
   );
 }

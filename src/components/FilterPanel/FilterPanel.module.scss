@@ -10,11 +10,12 @@
   background: $color-surface;
   border-radius: $radius-md;
   box-shadow: $shadow-card;
-  overflow: hidden;
+  overflow: hidden; /* 패널 자체는 넘치지 않고 내부에서 스크롤 */
 }
 
 .title {
   font-size: 16px;
   font-weight: 600;
   color: $color-text-primary;
+  flex-shrink: 0;
 }

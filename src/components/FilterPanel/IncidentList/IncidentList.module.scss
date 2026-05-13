@@ -1,0 +1,169 @@
+@use "sass:color";
+@use "../../../styles/variables" as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0; /* flex 자식이 overflow 가능하도록 */
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.listTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.count {
+  font-size: 12px;
+  color: $color-text-secondary;
+}
+
+/* ── 테이블 스크롤 컨테이너 ── */
+.tableWrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid $color-border;
+  border-radius: 6px;
+}
+
+.table {
+  width: 100%;
+  min-width: 340px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+/* ── thead ── */
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.table th {
+  padding: 8px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: $color-text-secondary;
+  text-align: left;
+  white-space: nowrap;
+  background: #f9fafb;
+  border-bottom: 1px solid $color-border;
+}
+
+/* ── tbody ── */
+.table td {
+  padding: 8px 6px;
+  color: $color-text-primary;
+  white-space: nowrap;
+  border-bottom: 1px solid $color-border;
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  cursor: pointer;
+  transition: background 0.12s;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+
+  &:last-child td {
+    border-bottom: none;
+  }
+}
+
+/* ── 위험도 배지 ── */
+.riskBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 36px;
+}
+
+.riskUrgent {
+  background: #fef2f2;
+  color: $color-risk-urgent;
+}
+
+.riskCaution {
+  background: #fffbeb;
+  color: color.adjust($color-risk-caution, $lightness: -10%);
+}
+
+.riskLow {
+  background: #fefce8;
+  color: color.adjust($color-risk-low, $lightness: -20%);
+}
+
+/* ── 상태 배지 ── */
+.statusBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.statusBefore {
+  background: #fef2f2;
+  color: $color-status-before;
+}
+
+.statusProgress {
+  background: #eff6ff;
+  color: $color-status-progress;
+}
+
+.statusDone {
+  background: #ecfdf5;
+  color: $color-status-done;
+}
+
+/* ── ID 셀 ── */
+.incidentId {
+  font-family: monospace;
+  font-size: 11px;
+  color: $color-text-secondary;
+}
+
+/* ── 주소 셀 (말줄임) ── */
+.address {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 날짜 셀 ── */
+.date {
+  font-size: 11px;
+  color: $color-text-secondary;
+}
+
+/* ── 빈 상태 / 로딩 / 에러 ── */
+.emptyState {
+  padding: 32px 16px;
+  text-align: center;
+  color: $color-text-secondary;
+  font-size: 13px;
+}
+
+.errorState {
+  padding: 32px 16px;
+  text-align: center;
+  color: $color-risk-urgent;
+  font-size: 13px;
+}
