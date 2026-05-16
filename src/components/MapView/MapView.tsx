@@ -70,7 +70,7 @@ function loadKakaoMapSDK(): Promise<void> {
       return;
     }
     const script = document.createElement('script');
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&autoload=false`;
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&autoload=false&libraries=services`;
     script.onload = () => window.kakao.maps.load(() => resolve());
     script.onerror = () => reject(new Error('카카오맵 SDK 로드 실패'));
     document.head.appendChild(script);

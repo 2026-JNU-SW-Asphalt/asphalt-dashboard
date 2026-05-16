@@ -1,0 +1,290 @@
+@use "../../styles/variables" as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  background: $color-surface;
+  border-radius: $radius-lg;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── 헤더 ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $color-border;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  font-size: 16px;
+  color: $color-text-secondary;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.12s;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+
+/* ── 본문 ── */
+.body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+/* ── 필드 ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-text-primary;
+}
+
+.optional {
+  font-weight: 400;
+  color: $color-text-secondary;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: $color-accent;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+/* ── 위치 ── */
+.locationLoading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: $color-text-secondary;
+  padding: 8px 0;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid $color-border;
+  border-top-color: $color-accent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.locationError {
+  font-size: 13px;
+  color: $color-risk-urgent;
+  margin: 0;
+  padding: 8px 12px;
+  background: #fef2f2;
+  border-radius: 6px;
+}
+
+.locationValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin: 0;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid $color-border;
+}
+
+/* ── 사진 업로드 ── */
+.uploadBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  border: 2px dashed $color-border;
+  border-radius: 8px;
+  background: #fafafa;
+  color: $color-text-secondary;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+
+  &:hover:not(:disabled) {
+    border-color: $color-accent;
+    background: #f0f7ff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.uploadIcon {
+  font-size: 20px;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.previewWrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid $color-border;
+}
+
+.previewImg {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+.removePhotoBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: background 0.12s;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* ── 에러 슬롯 ── */
+.errorSlot {
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.error {
+  font-size: 13px;
+  color: $color-risk-urgent;
+  margin: 0;
+  line-height: 20px;
+}
+
+/* ── 제보 버튼 ── */
+.primaryBtn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: $color-accent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+/* ── 성공 화면 ── */
+.successWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-top: 24px;
+}
+
+.successIcon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #fff;
+  background: $color-status-done;
+  border-radius: 50%;
+}
+
+.successText {
+  font-size: 18px;
+  font-weight: 600;
+  color: $color-text-primary;
+  margin: 0;
+}
+
+.successSub {
+  font-size: 14px;
+  color: $color-text-secondary;
+  margin: 0;
+}

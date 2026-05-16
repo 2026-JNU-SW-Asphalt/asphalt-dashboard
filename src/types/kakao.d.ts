@@ -54,6 +54,30 @@ declare namespace kakao.maps {
     function addListener(target: Marker | Map, type: string, handler: () => void): void;
     function removeListener(target: Marker | Map, type: string, handler: () => void): void;
   }
+
+  namespace services {
+    const Status: {
+      OK: string;
+      ZERO_RESULT: string;
+      ERROR: string;
+    };
+
+    interface RegionCode {
+      region_type: string;
+      region_1depth_name: string;
+      region_2depth_name: string;
+      region_3depth_name: string;
+      region_4depth_name: string;
+      code: string;
+      x: number;
+      y: number;
+    }
+
+    class Geocoder {
+      coord2RegionCode(x: number, y: number, callback: (result: RegionCode[], status: string) => void): void;
+      coord2Address(x: number, y: number, callback: (result: unknown[], status: string) => void): void;
+    }
+  }
 }
 
 interface Window {
