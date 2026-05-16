@@ -49,14 +49,12 @@ export function computeSummary(items: IncidentSummary[]): StatsSummary {
   return { total, unresolved, urgent, completionRate };
 }
 
-/** 자치구별 분포 (내림차순, 0건 포함) */
+/** 자치구별 분포 (고정 순서, 0건 포함) */
 export function computeByGu(items: IncidentSummary[]): CountItem[] {
   const map = new Map<string, number>();
   ALL_GU.forEach((gu) => map.set(gu, 0));
   items.forEach((i) => map.set(i.gu, (map.get(i.gu) ?? 0) + 1));
-  return Array.from(map.entries())
-    .map(([label, count]) => ({ label, count, color: GU_COLOR }))
-    .sort((a, b) => b.count - a.count);
+  return ALL_GU.map((gu) => ({ label: gu, count: map.get(gu) ?? 0, color: GU_COLOR }));
 }
 
 /** 보수 상태 분포 */
@@ -79,7 +77,7 @@ export function computeByRisk(items: IncidentSummary[]): CountItem[] {
   }));
 }
 
-/** 자치구 × 보수상태 교차 (내림차순, 0건 포함) */
+/** 자치구 × 보수상태 교차 (고정 순서, 0건 포함) */
 export function computeCross(items: IncidentSummary[]): CrossRow[] {
   const map = new Map<string, CrossRow>();
   ALL_GU.forEach((gu) => map.set(gu, { gu, before: 0, progress: 0, done: 0, total: 0 }));
@@ -91,5 +89,5 @@ export function computeCross(items: IncidentSummary[]): CrossRow[] {
     else row.done += 1;
     row.total += 1;
   });
-  return Array.from(map.values()).sort((a, b) => b.total - a.total);
+  return ALL_GU.map((gu) => map.get(gu)!);
 }

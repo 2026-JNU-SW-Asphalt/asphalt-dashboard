@@ -80,6 +80,15 @@
   color: $color-text-secondary;
 }
 
+.filterError {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 500;
+  color: $color-risk-urgent;
+  display: flex;
+  align-items: center;
+}
+
 .select {
   height: 34px;
   padding: 0 28px 0 10px;

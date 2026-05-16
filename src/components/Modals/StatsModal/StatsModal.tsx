@@ -41,18 +41,18 @@ const SKEL_DONUT_RISK = [
   { label: '낮음', count: 3, color: '#b8bcc3' },
 ];
 
-const SKEL_BAR = ['서구', '북구', '광산구', '남구', '동구'].map((label, i) => ({
+const SKEL_BAR = ['동구', '서구', '남구', '북구', '광산구'].map((label, i) => ({
   label,
-  count: [5, 4, 3, 2, 1][i],
+  count: [1, 5, 2, 4, 3][i],
   color: SKEL_GRAY,
 }));
 
-const SKEL_CROSS = ['서구', '북구', '광산구', '남구', '동구'].map((gu, i) => ({
+const SKEL_CROSS = ['동구', '서구', '남구', '북구', '광산구'].map((gu, i) => ({
   gu,
-  before: [2, 1, 1, 1, 0][i],
-  progress: [2, 2, 1, 1, 1][i],
-  done: [1, 1, 1, 0, 0][i],
-  total: [5, 4, 3, 2, 1][i],
+  before: [0, 2, 1, 1, 1][i],
+  progress: [1, 2, 1, 2, 1][i],
+  done: [0, 1, 0, 1, 1][i],
+  total: [1, 5, 2, 4, 3][i],
 }));
 
 export default function StatsModal({ onClose }: Props) {
@@ -107,7 +107,7 @@ export default function StatsModal({ onClose }: Props) {
           </button>
         </div>
 
-        {/* 필터 바 */}
+        {/* 필터 바 + 에러 안내 */}
         <div className={styles.filterBar}>
           <div className={styles.filterGroup}>
             <label className={styles.filterLabel} htmlFor="stats-gu">
@@ -118,7 +118,7 @@ export default function StatsModal({ onClose }: Props) {
               className={styles.select}
               value={guFilter}
               onChange={(e) => setGuFilter(e.target.value)}
-              disabled={loading}
+              disabled={loading || !!error}
             >
               {GU_OPTIONS.map((g) => (
                 <option key={g} value={g}>
@@ -136,7 +136,7 @@ export default function StatsModal({ onClose }: Props) {
               className={styles.select}
               value={riskFilter}
               onChange={(e) => setRiskFilter(e.target.value)}
-              disabled={loading}
+              disabled={loading || !!error}
             >
               {RISK_OPTIONS.map((r) => (
                 <option key={r} value={r}>
@@ -145,12 +145,13 @@ export default function StatsModal({ onClose }: Props) {
               ))}
             </select>
           </div>
+          {error && <span className={styles.filterError}>데이터를 불러오지 못했습니다.</span>}
         </div>
 
         {/* 본문 */}
         <div className={styles.body}>
-          {/* ── 스켈레톤 ── */}
-          {loading && (
+          {/* ── 스켈레톤: 로딩 중이거나 에러일 때 모두 표시 ── */}
+          {(loading || error) && (
             <div className={styles.skeletonWrap}>
               {/* 지표 카드 스켈레톤 */}
               <div className={styles.summaryGrid}>
@@ -175,9 +176,6 @@ export default function StatsModal({ onClose }: Props) {
               <StackedBarChart title="자치구별 보수 진행 현황" data={SKEL_CROSS} skeleton />
             </div>
           )}
-
-          {/* ── 에러 ── */}
-          {error && !loading && <div className={`${styles.stateMsg} ${styles.errorMsg}`}>{error}</div>}
 
           {/* ── 실제 데이터 ── */}
           {!loading && !error && (
