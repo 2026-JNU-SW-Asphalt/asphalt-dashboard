@@ -1,7 +1,7 @@
 export type RiskLevel = '긴급' | '주의' | '낮음';
 export type RepairStatus = '보수전' | '보수중' | '보수완료';
 export type District = '동구' | '서구' | '남구' | '북구' | '광산구';
-export type SortBy = 'risk_score' | 'occurred_at';
+export type SortBy = 'risk_score' | 'recent_update';
 export type SortOrder = 'asc' | 'desc';
 
 /** GET /api/incidents 응답 items 항목 */
@@ -48,6 +48,17 @@ export interface DashboardResponse {
   status: string;
   counts: {
     total: number;
+    /** 활성 Incident 개수 (보수전 + 보수중) */
+    active_total: number;
+    /** 활성 Incident 중 긴급 개수 (보수완료 제외) */
+    urgent_active_total: number;
+    /** 이번 주 보수완료 처리 개수 */
+    completed_this_week: number;
+    /** 이번 주 범위 */
+    weekly_range: {
+      from: string;
+      to: string;
+    };
     status_counts: {
       before_repair: number;
       in_progress: number;
@@ -59,6 +70,36 @@ export interface DashboardResponse {
       low: number;
     };
   };
+}
+
+/** GET /api/incidents/statistics 응답 */
+export interface StatisticsResponse {
+  status: string;
+  statistics: {
+    /** 전체 Incident 개수 */
+    total_detected: number;
+    /** 활성 Incident 개수 (보수전 + 보수중) */
+    active_total: number;
+    status_counts: {
+      before_repair: number;
+      in_progress: number;
+      completed: number;
+    };
+    risk_level_counts: {
+      urgent: number;
+      caution: number;
+      low: number;
+    };
+    /** 자치구별 개수 배열 (gu가 비어 있으면 '미분류') */
+    gu_counts: { gu: string; count: number }[];
+  };
+}
+
+/** 통계 필터 (statistics API 쿼리 파라미터) */
+export interface StatisticsFilter {
+  gu?: string;
+  risk_level?: string;
+  status?: string;
 }
 
 /** POST /api/admin/verify-key 성공 응답 */
@@ -79,10 +120,10 @@ export interface StatusChangeResponse {
 
 /** FilterContext에서 관리하는 필터 상태 */
 export interface FilterState {
-  gu: string; // '전체' or District
-  risk_level: string; // '전체' or RiskLevel
-  status: string; // '전체' or RepairStatus
-  date_from: string; // ISO 8601, 빈 문자열이면 미적용
+  gu: string;
+  risk_level: string;
+  status: string;
+  date_from: string;
   date_to: string;
   sort_by: SortBy;
   order: SortOrder;

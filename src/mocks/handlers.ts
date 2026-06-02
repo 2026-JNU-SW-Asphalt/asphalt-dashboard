@@ -30,8 +30,29 @@ export const handlers = [
   // 1. 대시보드 집계  GET /api/incidents/dashboard
   // ──────────────────────────────────────
   http.get('/api/incidents/dashboard', () => {
+    const activeItems = mockIncidents.filter((i) => i.status === '보수전' || i.status === '보수중');
+
+    // 이번 주 범위 (월요일 00:00 ~ 다음 월요일 00:00)
+    const now = new Date();
+    const day = now.getUTCDay(); // 0=일
+    const diffToMon = (day + 6) % 7;
+    const weekStart = new Date(now);
+    weekStart.setUTCDate(now.getUTCDate() - diffToMon);
+    weekStart.setUTCHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setUTCDate(weekStart.getUTCDate() + 7);
+
     const counts = {
       total: mockIncidents.length,
+      active_total: activeItems.length,
+      urgent_active_total: activeItems.filter((i) => i.risk_level === '긴급').length,
+      completed_this_week: mockIncidentDetails.filter(
+        (d) => d.recovered_at && new Date(d.recovered_at) >= weekStart && new Date(d.recovered_at) < weekEnd,
+      ).length,
+      weekly_range: {
+        from: weekStart.toISOString(),
+        to: weekEnd.toISOString(),
+      },
       status_counts: {
         before_repair: mockIncidents.filter((i) => i.status === '보수전').length,
         in_progress: mockIncidents.filter((i) => i.status === '보수중').length,
@@ -44,6 +65,50 @@ export const handlers = [
       },
     };
     return HttpResponse.json({ status: 'success', counts });
+  }),
+
+  // ──────────────────────────────────────
+  // 1-2. 통계  GET /api/incidents/statistics
+  // ──────────────────────────────────────
+  http.get('/api/incidents/statistics', ({ request }) => {
+    const url = new URL(request.url);
+    const gu = url.searchParams.get('gu');
+    const riskLevel = url.searchParams.get('risk_level');
+    const status = url.searchParams.get('status');
+
+    let result = [...mockIncidents];
+    if (gu) result = result.filter((i) => i.gu === gu);
+    if (riskLevel) result = result.filter((i) => i.risk_level === riskLevel);
+    if (status) result = result.filter((i) => i.status === status);
+
+    // 자치구별 집계
+    const guMap = new Map<string, number>();
+    result.forEach((i) => {
+      const key = i.gu || '미분류';
+      guMap.set(key, (guMap.get(key) ?? 0) + 1);
+    });
+    const gu_counts = Array.from(guMap.entries()).map(([g, count]) => ({
+      gu: g,
+      count,
+    }));
+
+    const statistics = {
+      total_detected: result.length,
+      active_total: result.filter((i) => i.status === '보수전' || i.status === '보수중').length,
+      status_counts: {
+        before_repair: result.filter((i) => i.status === '보수전').length,
+        in_progress: result.filter((i) => i.status === '보수중').length,
+        completed: result.filter((i) => i.status === '보수완료').length,
+      },
+      risk_level_counts: {
+        urgent: result.filter((i) => i.risk_level === '긴급').length,
+        caution: result.filter((i) => i.risk_level === '주의').length,
+        low: result.filter((i) => i.risk_level === '낮음').length,
+      },
+      gu_counts,
+    };
+
+    return HttpResponse.json({ status: 'success', statistics });
   }),
 
   // ──────────────────────────────────────
@@ -69,6 +134,7 @@ export const handlers = [
     if (dateTo) result = result.filter((i) => i.occurred_at <= dateTo);
 
     result.sort((a, b) => {
+      // recent_update는 mock에서 occurred_at으로 대체
       const aVal = sortBy === 'risk_score' ? a.risk_score : a.occurred_at;
       const bVal = sortBy === 'risk_score' ? b.risk_score : b.occurred_at;
       if (aVal === bVal) return 0;

@@ -25,11 +25,11 @@ export default function StatsBar() {
 
   const { counts } = data;
 
-  // 활성 포트홀 = 보수전 + 보수중
-  const activeCount = counts.status_counts.before_repair + counts.status_counts.in_progress;
+  // 활성 포트홀 = active_total (보수전 + 보수중)
+  const activeCount = counts.active_total;
 
-  // 긴급 보수 = risk_level_counts.urgent
-  const urgentCount = counts.risk_level_counts.urgent;
+  // 긴급 보수 = urgent_active_total (활성 중 긴급, 보수완료 제외)
+  const urgentCount = counts.urgent_active_total;
 
   // 보수 완료 (누적) = status_counts.completed
   const completedCount = counts.status_counts.completed;

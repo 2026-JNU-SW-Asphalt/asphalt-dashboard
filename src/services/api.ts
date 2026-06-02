@@ -2,6 +2,8 @@ import type {
   IncidentListResponse,
   IncidentDetail,
   DashboardResponse,
+  StatisticsResponse,
+  StatisticsFilter,
   FilterState,
   AdminVerifyResponse,
   StatusChangeResponse,
@@ -52,6 +54,22 @@ export async function fetchDashboard(): Promise<DashboardResponse> {
     headers: defaultHeaders,
   });
   if (!res.ok) throw new Error('dashboard 조회 실패');
+  return res.json();
+}
+
+// ─── 통계 조회 ───
+
+export async function fetchStatistics(filter: StatisticsFilter = {}): Promise<StatisticsResponse> {
+  const params = new URLSearchParams();
+  if (filter.gu && filter.gu !== '전체') params.set('gu', filter.gu);
+  if (filter.risk_level && filter.risk_level !== '전체') params.set('risk_level', filter.risk_level);
+  if (filter.status && filter.status !== '전체') params.set('status', filter.status);
+
+  const qs = params.toString();
+  const res = await fetch(`${BASE_URL}/incidents/statistics${qs ? `?${qs}` : ''}`, {
+    headers: defaultHeaders,
+  });
+  if (!res.ok) throw new Error('statistics 조회 실패');
   return res.json();
 }
 

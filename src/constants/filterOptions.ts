@@ -1,4 +1,4 @@
-import type { RiskLevel, RepairStatus, District, SortBy, SortOrder } from '../types/incident';
+import type { District, RiskLevel, RepairStatus, SortBy, SortOrder } from '../types/incident';
 
 export const ALL_VALUE = '전체';
 
@@ -9,7 +9,7 @@ export const RISK_LEVEL_OPTIONS: (typeof ALL_VALUE | RiskLevel)[] = [ALL_VALUE, 
 export const STATUS_OPTIONS: (typeof ALL_VALUE | RepairStatus)[] = [ALL_VALUE, '보수전', '보수중', '보수완료'];
 
 export const SORT_BY_OPTIONS: { value: SortBy; label: string }[] = [
-  { value: 'occurred_at', label: '신고일순' },
+  { value: 'recent_update', label: '최신순' },
   { value: 'risk_score', label: '위험도순' },
 ];
 
