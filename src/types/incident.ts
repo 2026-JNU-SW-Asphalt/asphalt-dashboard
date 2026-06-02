@@ -90,8 +90,14 @@ export interface StatisticsResponse {
       caution: number;
       low: number;
     };
-    /** 자치구별 개수 배열 (gu가 비어 있으면 '미분류') */
-    gu_counts: { gu: string; count: number }[];
+    /** 자치구별 상태 집계 배열 (gu가 비어 있으면 '미분류') */
+    gu_status_counts: {
+      gu: string;
+      total: number;
+      before_repair: number;
+      in_progress: number;
+      completed: number;
+    }[];
   };
 }
 

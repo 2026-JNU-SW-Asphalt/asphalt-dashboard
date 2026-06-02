@@ -81,15 +81,22 @@ export const handlers = [
     if (riskLevel) result = result.filter((i) => i.risk_level === riskLevel);
     if (status) result = result.filter((i) => i.status === status);
 
-    // 자치구별 집계
-    const guMap = new Map<string, number>();
+    // 자치구별 상태 집계
+    const guMap = new Map<string, { total: number; before_repair: number; in_progress: number; completed: number }>();
     result.forEach((i) => {
       const key = i.gu || '미분류';
-      guMap.set(key, (guMap.get(key) ?? 0) + 1);
+      if (!guMap.has(key)) {
+        guMap.set(key, { total: 0, before_repair: 0, in_progress: 0, completed: 0 });
+      }
+      const row = guMap.get(key)!;
+      row.total += 1;
+      if (i.status === '보수전') row.before_repair += 1;
+      else if (i.status === '보수중') row.in_progress += 1;
+      else row.completed += 1;
     });
-    const gu_counts = Array.from(guMap.entries()).map(([g, count]) => ({
-      gu: g,
-      count,
+    const gu_status_counts = Array.from(guMap.entries()).map(([gu, c]) => ({
+      gu,
+      ...c,
     }));
 
     const statistics = {
@@ -105,7 +112,7 @@ export const handlers = [
         caution: result.filter((i) => i.risk_level === '주의').length,
         low: result.filter((i) => i.risk_level === '낮음').length,
       },
-      gu_counts,
+      gu_status_counts,
     };
 
     return HttpResponse.json({ status: 'success', statistics });

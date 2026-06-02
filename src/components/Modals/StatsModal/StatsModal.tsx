@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { fetchStatistics } from '../../../services/api';
 import DonutChart from './DonutChart';
-import BarChart from './BarChart';
+import StackedBarChart from './StackedBarChart';
 import styles from './StatsModal.module.scss';
 
 import type { StatisticsResponse } from '../../../types/incident';
-import type { CountItem } from '../../../utils/statistics';
+import type { CountItem, CrossRow } from '../../../utils/statistics';
 
 interface Props {
   onClose: () => void;
@@ -18,7 +18,6 @@ const ALL_GU = ['동구', '서구', '남구', '북구', '광산구'];
 
 const STATUS_COLORS = { before: '#ef4444', progress: '#3b82f6', done: '#10b981' };
 const RISK_COLORS = { urgent: '#ea5a52', caution: '#efaa3a', low: '#f3d746' };
-const GU_COLOR = '#2563eb';
 
 // ─── 스켈레톤용 임시 데이터 (회색 톤) ───
 const SKEL_GRAY = '#d1d5db';
@@ -36,10 +35,12 @@ const SKEL_DONUT_RISK: CountItem[] = [
   { label: '낮음', count: 3, color: '#b8bcc3' },
 ];
 
-const SKEL_BAR: CountItem[] = ALL_GU.map((label, i) => ({
-  label,
-  count: [1, 5, 2, 4, 3][i],
-  color: SKEL_GRAY,
+const SKEL_CROSS: CrossRow[] = ALL_GU.map((gu, i) => ({
+  gu,
+  before: [0, 2, 1, 1, 1][i],
+  progress: [1, 2, 1, 2, 1][i],
+  done: [0, 1, 0, 1, 1][i],
+  total: [1, 5, 2, 4, 3][i],
 }));
 
 export default function StatsModal({ onClose }: Props) {
@@ -72,6 +73,9 @@ export default function StatsModal({ onClose }: Props) {
     };
   }, [guFilter, riskFilter]);
 
+  // 특정 구가 선택되면 자치구별 차트는 무의미 → 전체일 때만 표시
+  const showGuChart = guFilter === '전체';
+
   // ─── 집계 → 차트 데이터 변환 ───
   const summary = useMemo(() => {
     if (!stats) return { total: 0, unresolved: 0, urgent: 0, completionRate: 0 };
@@ -103,12 +107,20 @@ export default function StatsModal({ onClose }: Props) {
     ];
   }, [stats]);
 
-  // gu_counts → 전체 자치구 고정 순서 (없는 구는 0건)
-  const byGu: CountItem[] = useMemo(() => {
+  // gu_status_counts → CrossRow[] (전체 자치구 고정 순서, 없는 구는 0건)
+  const cross: CrossRow[] = useMemo(() => {
     if (!stats) return [];
-    const map = new Map<string, number>();
-    stats.gu_counts.forEach((g) => map.set(g.gu, g.count));
-    return ALL_GU.map((gu) => ({ label: gu, count: map.get(gu) ?? 0, color: GU_COLOR }));
+    const map = new Map(stats.gu_status_counts.map((g) => [g.gu, g]));
+    return ALL_GU.map((gu) => {
+      const row = map.get(gu);
+      return {
+        gu,
+        before: row?.before_repair ?? 0,
+        progress: row?.in_progress ?? 0,
+        done: row?.completed ?? 0,
+        total: row?.total ?? 0,
+      };
+    });
   }, [stats]);
 
   return (
@@ -184,8 +196,8 @@ export default function StatsModal({ onClose }: Props) {
                 <DonutChart title="위험도 분포" data={SKEL_DONUT_RISK} skeleton />
               </div>
 
-              {/* 막대 스켈레톤 */}
-              <BarChart title="자치구별 포트홀 분포" data={SKEL_BAR} skeleton />
+              {/* 자치구별 보수상태 스켈레톤 */}
+              <StackedBarChart title="자치구별 보수 진행 현황" data={SKEL_CROSS} skeleton />
             </div>
           )}
 
@@ -222,7 +234,8 @@ export default function StatsModal({ onClose }: Props) {
                     <DonutChart title="보수 상태 분포" data={byStatus} />
                     <DonutChart title="위험도 분포" data={byRisk} />
                   </div>
-                  <BarChart title="자치구별 포트홀 분포" data={byGu} />
+                  {/* 특정 구 선택 시 자치구별 차트는 의미가 없으므로 전체일 때만 표시 */}
+                  {showGuChart && <StackedBarChart title="자치구별 보수 진행 현황" data={cross} />}
                 </>
               )}
             </>
