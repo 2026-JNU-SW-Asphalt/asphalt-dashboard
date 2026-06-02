@@ -165,13 +165,16 @@
   color: $color-accent;
 }
 
-.statusCurrent {
-  /* 현재 상태 시각적 표시 */
-}
-
 .currentTag {
   display: block;
   font-size: 10px;
   color: $color-text-secondary;
   margin-top: 2px;
+}
+
+.irreversibleWarning {
+  font-size: 12px;
+  color: $color-risk-urgent;
+  line-height: 1.5;
+  margin: 0;
 }

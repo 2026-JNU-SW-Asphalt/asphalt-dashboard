@@ -124,7 +124,7 @@ export default function RepairManageModal({ incidentId, currentStatus, onClose }
                       <button
                         key={s}
                         type="button"
-                        className={`${styles.statusOption} ${selectedStatus === s ? styles.statusSelected : ''} ${s === currentStatus ? styles.statusCurrent : ''}`}
+                        className={`${styles.statusOption} ${selectedStatus === s ? styles.statusSelected : ''}`}
                         onClick={() => setSelectedStatus(s)}
                         disabled={loading}
                       >
@@ -133,10 +133,11 @@ export default function RepairManageModal({ incidentId, currentStatus, onClose }
                       </button>
                     ))}
                   </div>
+                  <p className={styles.irreversibleWarning}>
+                    ⚠ 보수완료로 변경하면 이전 상태(보수전·보수중)로 되돌릴 수 없습니다.
+                  </p>
                 </>
               )}
-
-              <div className={styles.errorSlot}>{error && <p className={styles.error}>{error}</p>}</div>
 
               {!isCompleted && (
                 <button
